@@ -11,7 +11,7 @@ Display on a little LCD (4*20) all tweets which contains `Je veux`
 
 ## Installation
 
-Create a `config.json``
+Create a `config.json`
 
 ```bash
 npm install
