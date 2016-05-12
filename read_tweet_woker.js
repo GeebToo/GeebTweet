@@ -98,7 +98,7 @@ function displayTweet(msg, cb) {
     if (displayOnLCD) {
         var LCD = require('lcdi2c');
         var lcd = new LCD( 1, 0x27, 20, 4 );
-        var lcdTweet = formatTweetForLCD(tweet, lcdNbreOfLine);
+        var lcdTweet = formatTweetForLCD(tweet, lcdLineLenght);
         lcd.clear();
         for (var j = 0; j < lcdTweet.length && j < lcdNbreOfLine; j++) {
             lcd.println(lcdTweet[j], j+1);
