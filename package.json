@@ -1,0 +1,16 @@
+{
+  "name": "geebtweet",
+  "version": "1.0.0",
+  "description": "Display on a little LCD (4*20) all tweets which contains a specific word or sentence",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "GeebToo",
+  "license": "MIT",
+  "dependencies": {
+    "amqplib": "^0.4.1",
+    "moment": "^2.12.0",
+    "twitter": "^1.2.5"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "consumer_key": "clientID",
+  "consumer_secret": "clientSecret",
+  "access_token_key": "tokenKey",
+  "access_token_secret": "tokenSecret",
+  "rabbitmq_host": "yourRabbitmqHost",
+  "rabbitmq_queue": "nameOfQueue",
+  "timeByTweet" : 6000,
+  "displayOnLCD" : true,
+  "lcdLineLenght" : 20,
+  "lcdNbreOfLine" : 4
+}
