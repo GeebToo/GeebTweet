@@ -2,7 +2,7 @@
 
 Display on a little LCD (4*20) all tweets which contains `Je veux`
 
-![GeebTweet]()
+![GeebTweet](https://raw.githubusercontent.com/GeebToo/GeebTweet/master/screenshots/geebtweet.jpg)
 
 ## Dependencies
 
