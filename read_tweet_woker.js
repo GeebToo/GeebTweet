@@ -1,15 +1,18 @@
 var amqp = require('amqplib/callback_api');
-var Twitter = require('twitter');
+var winston = require('winston');
 var config = require('./config.json');
 
-var client = new Twitter({
-    consumer_key: config.consumer_key,
-    consumer_secret: config.consumer_secret,
-    access_token_key: config.access_token_key,
-    access_token_secret: config.access_token_secret,
+var transports = [];
+transports.push(new (winston.transports.Console)({
+    timestamp: true,
+    colorize: true,
+    handleExceptions: false
+}));
+var logger = new (winston.Logger)({
+    level: config.logLevel,
+    transports: transports
 });
 var rabbitHost = config.rabbitmq_host;
-
 var queue = config.rabbitmq_queue;
 var queueOptions = {
     durable: true
@@ -31,21 +34,21 @@ function init() {
     amqp.connect(rabbitHost + '?heartbeat=60', function(err, conn) {
 
         if (err) {
-            console.error('[AMQP]', err.message);
-            return setTimeout(start, 1000);
+            logger.error('[AMQP]', err.message);
+            return setTimeout(init, 1000);
         }
 
         conn.on('error', function(err) {
             if (err.message !== 'Connection closing') {
-                console.error('[AMQP] conn error', err.message);
+                logger.error('[AMQP] conn error', err.message);
             }
         });
         conn.on('close', function() {
-            console.error('[AMQP] reconnecting');
-            return setTimeout(start, 1000);
+            logger.error('[AMQP] reconnecting');
+            return setTimeout(init, 1000);
         });
 
-        console.log('[AMQP] connected');
+        logger.info('[AMQP] connected');
         amqpConn = conn;
         startWorker();
     });
@@ -60,10 +63,10 @@ function startWorker() {
         }
 
         ch.on('error', function(err) {
-            console.error('[AMQP] channel error', err.message);
+            logger.error('[AMQP] channel error', err.message);
         });
         ch.on('close', function() {
-            console.log('[AMQP] channel closed');
+            logger.info('[AMQP] channel closed');
         });
 
         ch.prefetch(1);
@@ -76,7 +79,7 @@ function startWorker() {
             ch.consume(queue, processMsg, {
                 noAck: false
             });
-            console.log('Worker is started');
+            logger.info('Worker is started');
         });
 
         function processMsg(msg) {
@@ -122,7 +125,7 @@ function closeOnErr(err) {
         return false;
     }
 
-    console.error('[AMQP] error', err);
+    logger.error('[AMQP] error', err);
     amqpConn.close();
     return true;
 }

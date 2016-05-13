@@ -1,6 +1,18 @@
 var amqp = require('amqplib/callback_api');
 var Twitter = require('twitter');
+var winston = require('winston');
 var config = require('./config.json');
+
+var transports = [];
+transports.push(new (winston.transports.Console)({
+    timestamp: true,
+    colorize: true,
+    handleExceptions: false
+}));
+var logger = new (winston.Logger)({
+    level: config.logLevel,
+    transports: transports
+});
 
 var client = new Twitter({
     consumer_key: config.consumer_key,
@@ -9,9 +21,7 @@ var client = new Twitter({
     access_token_secret: config.access_token_secret,
 });
 var rabbitHost = config.rabbitmq_host;
-
 var phrase = "JE VEUX";
-
 var tweetId = 0;
 var queue = config.rabbitmq_queue;
 var queueOptions = {
@@ -27,21 +37,21 @@ function init() {
     amqp.connect(rabbitHost + '?heartbeat=60', function(err, conn) {
 
         if (err) {
-            console.error('[AMQP]', err.message);
-            return setTimeout(start, 1000);
+            logger.error('[AMQP]', err.message);
+            return setTimeout(init, 1000);
         }
 
         conn.on('error', function(err) {
             if (err.message !== 'Connection closing') {
-                console.error('[AMQP] conn error', err.message);
+                logger.error('[AMQP] conn error', err.message);
             }
         });
         conn.on('close', function() {
-            console.error('[AMQP] reconnecting');
-            return setTimeout(start, 1000);
+            logger.error('[AMQP] reconnecting');
+            return setTimeout(init, 1000);
         });
 
-        console.log('[AMQP] connected');
+        logger.info('[AMQP] connected');
         amqpConn = conn;
         whenConnected();
     });
@@ -61,11 +71,11 @@ function startPublisher() {
         if (closeOnErr(err)) return;
 
         ch.on('error', function(err) {
-            console.error('[AMQP] channel error', err.message);
+            logger.error('[AMQP] channel error', err.message);
         });
 
         ch.on('close', function() {
-            console.log('[AMQP] channel closed');
+            logger.info('[AMQP] channel closed');
         });
 
         //Read old messages if the worker lost connection
@@ -90,13 +100,13 @@ function publish(exchange, routingKey, content) {
             persistent: true
         }, function(err, ok) {
             if (err) {
-                console.error('[AMQP] publish', err);
+                logger.error('[AMQP] publish', err);
                 offlinePubQueue.push([exchange, routingKey, content]);
                 pubChannel.connection.close();
             }
         });
     } catch (e) {
-        console.error('[AMQP] publish', e.message);
+        logger.error('[AMQP] publish', e.message);
         offlinePubQueue.push([exchange, routingKey, content]);
     }
 }
@@ -106,7 +116,7 @@ function closeOnErr(err) {
         return false;
     }
 
-    console.error('[AMQP] error', err);
+    logger.error('[AMQP] error', err);
     amqpConn.close();
     return true;
 }
@@ -136,8 +146,8 @@ setInterval(function() {
                         publish('', queue, new Buffer(phrase + tweetSplit[0]));
                     }
                 } else {
-                    console.log('[TWEETER] same tweet : ' + tweets.statuses[i].text);
-                    console.log(tweets.statuses.length + ' i = ' + i);
+                    logger.debug('[TWEETER] same tweet : ' + tweets.statuses[i].text);
+                    logger.info(tweets.statuses.length + ' i = ' + i);
                 }
 
                 if (i == tweets.statuses.length - 1) {

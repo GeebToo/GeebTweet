@@ -1,4 +1,5 @@
 {
+  "logLevel" : "warn",
   "consumer_key": "clientID",
   "consumer_secret": "clientSecret",
   "access_token_key": "tokenKey",
