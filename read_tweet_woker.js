@@ -1,7 +1,6 @@
 var amqp = require('amqplib/callback_api');
 var Twitter = require('twitter');
 var config = require('./config.json');
-var moment = require('moment');
 
 var client = new Twitter({
     consumer_key: config.consumer_key,
@@ -19,6 +18,11 @@ var timeByTweet = config.timeByTweet;
 var displayOnLCD = config.displayOnLCD; // if true run : "npm install lcdi2c" !!
 var lcdLineLenght = config.lcdLineLenght;
 var lcdNbreOfLine = config.lcdNbreOfLine;
+
+if (displayOnLCD) {
+    var LCD = require('lcdi2c');
+    var lcd = new LCD( 1, 0x27, 20, 4 );
+}
 
 // if the connection is closed or fails to be established at all, we will reconnect
 var amqpConn = null;
@@ -96,8 +100,6 @@ function displayTweet(msg, cb) {
     var tweet = msg.content.toString();
 
     if (displayOnLCD) {
-        var LCD = require('lcdi2c');
-        var lcd = new LCD( 1, 0x27, 20, 4 );
         var lcdTweet = formatTweetForLCD(tweet, lcdLineLenght);
         lcd.clear();
         for (var j = 0; j < lcdTweet.length && j < lcdNbreOfLine; j++) {
