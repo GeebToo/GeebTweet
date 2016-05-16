@@ -16,12 +16,10 @@ app.get('/', function (req, res) {
 
 io.on('connection', function (socket) {
 	var refreshTweet = setInterval(function(){
-		console.log('connected !')
 		socket.emit('new tweet', tweets[Math.floor((Math.random() * 3))]);
 	}, 2000);
 
 	socket.on('disconnect', function () {
-		console.log('disconnect !');
 		clearInterval(refreshTweet);
 	});
 });
