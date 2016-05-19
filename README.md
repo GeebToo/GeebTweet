@@ -29,4 +29,8 @@ node get_tweet_worker.js
 
 # to run the worker which get the tweets in queue of RabbitMQ and displays (in LCD or console)
 node read_tweet_worker.js
+
+# to run the web server which get the tweets in queue of RabbitMQ and displays in web page with socket.io
+node app.js
+# then go to http://server_address:3000
 ```
