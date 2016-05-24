@@ -1,18 +1,9 @@
 var amqp = require('amqplib/callback_api');
 var Twitter = require('twitter');
-var winston = require('winston');
+var Logger = require('./common/logger.js');
 var config = require('./config.json');
 
-var transports = [];
-transports.push(new (winston.transports.Console)({
-    timestamp: true,
-    colorize: true,
-    handleExceptions: false
-}));
-var logger = new (winston.Logger)({
-    level: config.logLevel,
-    transports: transports
-});
+var logger = Logger.createLogger();
 
 var client = new Twitter({
     consumer_key: config.consumer_key,

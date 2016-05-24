@@ -1,17 +1,9 @@
 var amqp = require('amqplib/callback_api');
-var winston = require('winston');
+var Logger = require('./common/logger.js');
 var config = require('./config.json');
 
-var transports = [];
-transports.push(new (winston.transports.Console)({
-    timestamp: true,
-    colorize: true,
-    handleExceptions: false
-}));
-var logger = new (winston.Logger)({
-    level: config.logLevel,
-    transports: transports
-});
+var logger = Logger.createLogger();
+
 var rabbitHost = config.rabbitmq_host;
 var queue = config.rabbitmq_queue;
 var queueOptions = {
