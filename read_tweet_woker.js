@@ -1,14 +1,8 @@
-var amqp = require('amqplib/callback_api');
 var Logger = require('./common/logger.js');
+var RabbitMQMapper = require('./common/rabbitMQMapper.js');
 var config = require('./config.json');
 
 var logger = Logger.createLogger();
-
-var rabbitHost = config.rabbitmq_host;
-var queue = config.rabbitmq_queue;
-var queueOptions = {
-    durable: true
-};
 var timeByTweet = config.timeByTweet;
 var displayOnLCD = config.displayOnLCD; // if true run : "npm install lcdi2c" !!
 var lcdLineLenght = config.lcdLineLenght;
@@ -18,78 +12,7 @@ if (displayOnLCD) {
     var LCD = require('lcdi2c');
     var lcd = new LCD( 1, 0x27, 20, 4 );
 }
-
-// if the connection is closed or fails to be established at all, we will reconnect
-var amqpConn = null;
-
-function init() {
-    amqp.connect(rabbitHost + '?heartbeat=60', function(err, conn) {
-
-        if (err) {
-            logger.error('[AMQP]', err.message);
-            return setTimeout(init, 1000);
-        }
-
-        conn.on('error', function(err) {
-            if (err.message !== 'Connection closing') {
-                logger.error('[AMQP] conn error', err.message);
-            }
-        });
-        conn.on('close', function() {
-            logger.error('[AMQP] reconnecting');
-            return setTimeout(init, 1000);
-        });
-
-        logger.info('[AMQP] connected');
-        amqpConn = conn;
-        startWorker();
-    });
-}
-
-// A worker that acks messages only if processed succesfully
-function startWorker() {
-    amqpConn.createChannel(function(err, ch) {
-
-        if (closeOnErr(err)) {
-            return;
-        }
-
-        ch.on('error', function(err) {
-            logger.error('[AMQP] channel error', err.message);
-        });
-        ch.on('close', function() {
-            logger.info('[AMQP] channel closed');
-        });
-
-        ch.prefetch(1);
-        ch.assertQueue(queue, queueOptions, function(err, _ok) {
-
-            if (closeOnErr(err)) {
-                return;
-            }
-
-            ch.consume(queue, processMsg, {
-                noAck: false
-            });
-            logger.info('Worker is started');
-        });
-
-        function processMsg(msg) {
-                displayTweet(msg, function(ok) {
-                    try {
-                        if (ok) {
-                            ch.ack(msg);
-                        } else {
-                            ch.reject(msg, true);
-                        }
-                    } catch (e) {
-                        closeOnErr(e);
-                    }
-                });
-            
-        }
-    });
-}
+RabbitMQMapper.initConsumer(logger, displayTweet);
 
 function displayTweet(msg, cb) {
     var tweet = msg.content.toString();
@@ -108,18 +31,6 @@ function displayTweet(msg, cb) {
     setTimeout(function(){
         cb(true);
     }, timeByTweet);
-}
-
-
-
-function closeOnErr(err) {
-    if (!err) {
-        return false;
-    }
-
-    logger.error('[AMQP] error', err);
-    amqpConn.close();
-    return true;
 }
 
 function formatTweetForLCD (tweet, lineLength) {
@@ -177,5 +88,3 @@ function accentsTidy(s){
     r = r.replace(new RegExp("[ÝŸ]", 'g'),"Y");
     return r;
 };
-
-init();

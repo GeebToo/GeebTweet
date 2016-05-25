@@ -6,25 +6,26 @@ var queueOptions = {
     durable: true
 };
 
-var self = module.exports = {
-	closeOnErr : function(err, amqpConn) {
-	    if (!err) {
-	        return false;
-	    }
+var pubChannel = "null";
+var offlinePubQueue = [];
 
-	    logger.error('[AMQP] error', err);
-	    amqpConn.close();
-	    return true;
-	},
+var self = module.exports = {
+	pubChannel : pubChannel,
+
+	offlinePubQueue : offlinePubQueue,
+
+	queue : queue,
+	//################################################################
+	// Create connection to RabbitMQ and run the worker that read message
 	// if the connection is closed or fails to be established at all, we will reconnect
-	init : function(logger, callback) {
-		logger.info("blabla");
+	//################################################################
+	initConsumer : function(logger, callback) {
 		amqp.connect(rabbitHost + '?heartbeat=60', function(err, amqpConn) {
 
 	        if (err) {
 	            logger.error('[AMQP]', err.message);
 	            return setTimeout(function() {
-	            	self.init(logger, callback)
+	            	self.initConsume(logger, callback)
 	            }, 1000);
 	        }
 
@@ -37,16 +38,18 @@ var self = module.exports = {
 	            logger.error('[AMQP] reconnecting');
 	            return setTimeout(
 	            	function() {
-	            		self.init(logger, callback)
+	            		self.initConsume(logger, callback)
 	            	}, 1000);
 	        });
 
 	        logger.info('[AMQP] connected');
-	        self.startWorker(amqpConn, logger, callback);
+	        self.startConsumer(amqpConn, logger, callback);
 	    });
 	},
+	//################################################################
 	// A worker that acks messages only if processed succesfully
-	startWorker : function(amqpConn, logger, callback) {
+	//################################################################
+	startConsumer : function(amqpConn, logger, callback) {
 		amqpConn.createChannel(function(err, ch) {
 
 	        if (self.closeOnErr(err, amqpConn)) {
@@ -87,5 +90,96 @@ var self = module.exports = {
                 });
 	        }
 	    });
-	}
+	},
+	//################################################################
+	// Create connection to RabbitMQ and run the worker that publish message
+	// if the connection is closed or fails to be established at all, we will reconnect
+	//################################################################
+	initPublisher : function(logger) {
+		amqp.connect(rabbitHost + '?heartbeat=60', function(err, amqpConn) {
+
+	        if (err) {
+	            logger.error('[AMQP]', err.message);
+	            return setTimeout(function() {
+	            	self.initPublisher(logger)
+	            }, 1000);
+	        }
+
+	        amqpConn.on('error', function(err) {
+	            if (err.message !== 'Connection closing') {
+	                logger.error('[AMQP] conn error', err.message);
+	            }
+	        });
+	        amqpConn.on('close', function() {
+	            logger.error('[AMQP] reconnecting');
+	            return setTimeout(
+	            	function() {
+	            		self.initPublisher(logger)
+	            	}, 1000);
+	        });
+
+	        logger.info('[AMQP] connected');
+	        self.startPublisher(amqpConn, logger);
+	    });
+	},
+	//################################################################
+	// A worker that publish message
+	//################################################################
+	startPublisher : function(amqpConn, logger) {
+	    amqpConn.createConfirmChannel(function(err, ch) {
+
+	        if (self.closeOnErr(err, amqpConn)) {
+	        	return;
+	        }
+
+	        ch.on('error', function(err) {
+	            logger.error('[AMQP] channel error', err.message);
+	        });
+
+	        ch.on('close', function() {
+	            logger.info('[AMQP] channel closed');
+	        });
+
+	        // Read old messages if the worker lost connection
+	        self.pubChannel = ch
+	        while (true) {
+	            var m = self.offlinePubQueue.shift();
+
+	            if (!m) {
+	                break;
+	            }
+
+	            self.publish(m[0], m[1], m[2]);
+	        }
+	    });
+	},
+	//################################################################
+	// function to publish message and if connection fail, store message in variable to save it
+	//################################################################
+	publish : function(exchange, routingKey, content) {
+	    try {
+	        self.pubChannel.publish(exchange, routingKey, content, {
+	            persistent: true
+	        }, function(err, ok) {
+	            if (err) {
+	                logger.error('[AMQP] publish', err);
+	                self.offlinePubQueue.push([exchange, routingKey, content]);
+	                self.pubChannel.connection.close();
+	            }
+	        });
+	    } catch (e) {
+	        logger.error('[AMQP] publish', e.message);
+	        self.offlinePubQueue.push([exchange, routingKey, content]);
+	    }
+	},
+
+	closeOnErr : function(err, amqpConn) {
+	    if (!err) {
+	        return false;
+	    }
+
+	    logger.error('[AMQP] error', err);
+	    amqpConn.close();
+	    return true;
+	},
 }

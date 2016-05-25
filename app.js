@@ -2,7 +2,6 @@ var express = require('express');
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-var amqp = require('amqplib/callback_api');
 var Logger = require('./common/logger.js');
 var RabbitMQMapper = require('./common/rabbitMQMapper.js');
 var config = require('./config.json');
@@ -25,7 +24,7 @@ io.on('connection', function (socket) {
 	});
 });
 
-RabbitMQMapper.init(logger, displayTweet);
+RabbitMQMapper.initConsumer(logger, displayTweet);
 server.listen(3000);
 
 function displayTweet(msg, cb) {
