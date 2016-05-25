@@ -1,6 +1,8 @@
 # Changelog
 
-## 1.1.0
+## 1.x.x
+- [REFACTO] Create RabbitMQ mapper
+- [REFACTO] Create Looger object
 - Added web page with socket.io to display tweets
 
 ## 1.0.0
