@@ -25,7 +25,7 @@ var self = module.exports = {
 	        if (err) {
 	            logger.error('[AMQP]', err.message);
 	            return setTimeout(function() {
-	            	self.initConsume(logger, callback)
+	            	self.initConsumer(logger, callback)
 	            }, 1000);
 	        }
 
@@ -38,7 +38,7 @@ var self = module.exports = {
 	            logger.error('[AMQP] reconnecting');
 	            return setTimeout(
 	            	function() {
-	            		self.initConsume(logger, callback)
+	            		self.initConsumer(logger, callback)
 	            	}, 1000);
 	        });
 
