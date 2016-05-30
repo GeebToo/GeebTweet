@@ -25,7 +25,7 @@ npm install lcdi2c
 
 ```bash
 # to run the crawler to the Twitter API and store the tweets formatted in RabbitMQ.
-# Specify the sentence you want
+# Specify the sentence you want and the worker will collect only the tweets that contain that sentence
 node get_tweet_worker.js "<sentence>" <country code>
 
 # to run the worker which get the tweets in queue of RabbitMQ and displays (in LCD or console)
