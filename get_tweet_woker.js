@@ -1,6 +1,6 @@
 var Twitter = require('twitter');
 var Logger = require('./common/logger.js');
-var _ = require('lodash/string');
+var Utils = require('./common/utils.js');
 var RabbitMQMapper = require('./common/rabbitMQMapper.js');
 var config = require('./config.json');
 
@@ -25,7 +25,7 @@ if (process.argv.length != 4) {
 var sentence = process.argv[2];
 var locale = process.argv[3];
 var tweetId = 0;
-var regex = new RegExp(createRegex(sentence));
+var regex = new RegExp(Utils.createRegex(sentence));
 
 RabbitMQMapper.initPublisher(logger);
 
@@ -47,11 +47,11 @@ setInterval(function() {
                     var tweetSplit = tweet.split(regex);
 
                     if (tweetSplit[1] !== undefined) {
-                        RabbitMQMapper.publish('', RabbitMQMapper.queue, new Buffer(sentence + tweetSplit[1]));
-                        logger.debug(sentence + tweetSplit[1]);
+                        RabbitMQMapper.publish('', RabbitMQMapper.queue, new Buffer(sentence.toUpperCase() + tweetSplit[1]));
+                        logger.debug(sentence.toUpperCase() + tweetSplit[1]);
                     } else {
-                        RabbitMQMapper.publish('', RabbitMQMapper.queue, new Buffer(sentence + tweetSplit[0]));
-                        logger.debug(sentence + tweetSplit[0]);
+                        RabbitMQMapper.publish('', RabbitMQMapper.queue, new Buffer(sentence.toUpperCase() + tweetSplit[0]));
+                        logger.debug(sentence.toUpperCase() + tweetSplit[0]);
                     }
                 } else {
                     logger.debug('[TWEETER] same tweet : ' + tweets.statuses[i].text);
@@ -63,26 +63,4 @@ setInterval(function() {
                 }
             };
         });
-}, 60000);
-
-function createRegex(sentence) {
-    var regexStr = '';
-
-    for (var i = 0; i < sentence.length; i++) {
-        if (sentence[i].toLowerCase() === _.lowerCase(sentence[i])) {
-            regexStr += '['
-                + sentence[i].toLowerCase()
-                + sentence[i].toUpperCase()
-                + ']';
-        } else {
-            regexStr += '['
-                + sentence[i].toLowerCase()
-                + sentence[i].toUpperCase()
-                + _.lowerCase(sentence[i])
-                + _.upperCase(sentence[i])
-                + ']'; 
-        }
-    }
-
-    return regexStr;
-}
+}, 6000);
