@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.1
+ - [HOTFIX] Fix bugs in get_tweet_worker.js
+
 ## 1.1.0
 - [FEAT] Now it's possible to add argements when launching get_tweet_worker.js to choose the tweets to collect.
 - [FIX] Little bugs

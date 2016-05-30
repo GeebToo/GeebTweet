@@ -40,27 +40,31 @@ setInterval(function() {
             since_id: tweetId
         },
         function(error, tweets, response) {
+            if (tweets.statuses) {
+                for (var i = 0; i < tweets.statuses.length; i++) {
+                    if (tweets.statuses[i].id > tweetId) {
+                        var tweet = tweets.statuses[i].text;
+                        var tweetSplit = tweet.split(regex);
 
-            for (var i = 0; i < tweets.statuses.length; i++) {
-                if (tweets.statuses[i].id > tweetId) {
-                    var tweet = tweets.statuses[i].text;
-                    var tweetSplit = tweet.split(regex);
-
-                    if (tweetSplit[1] !== undefined) {
-                        RabbitMQMapper.publish('', RabbitMQMapper.queue, new Buffer(sentence.toUpperCase() + tweetSplit[1]));
-                        logger.debug(sentence.toUpperCase() + tweetSplit[1]);
+                        if (tweetSplit[1] !== undefined) {
+                            RabbitMQMapper.publish('', RabbitMQMapper.queue, new Buffer(sentence.toUpperCase() + tweetSplit[1]));
+                            logger.debug(sentence.toUpperCase() + tweetSplit[1]);
+                        } else {
+                            RabbitMQMapper.publish('', RabbitMQMapper.queue, new Buffer(sentence.toUpperCase() + tweetSplit[0]));
+                            logger.debug(sentence.toUpperCase() + tweetSplit[0]);
+                        }
                     } else {
-                        RabbitMQMapper.publish('', RabbitMQMapper.queue, new Buffer(sentence.toUpperCase() + tweetSplit[0]));
-                        logger.debug(sentence.toUpperCase() + tweetSplit[0]);
+                        logger.debug('[TWEETER] same tweet : ' + tweets.statuses[i].text);
+                        logger.info(tweets.statuses.length + ' i = ' + i);
                     }
-                } else {
-                    logger.debug('[TWEETER] same tweet : ' + tweets.statuses[i].text);
-                    logger.info(tweets.statuses.length + ' i = ' + i);
+
+                    if (i == tweets.statuses.length - 1) {
+                        tweetId = tweets.search_metadata.max_id;
+                    }
                 }
 
-                if (i == tweets.statuses.length - 1) {
-                    tweetId = tweets.search_metadata.max_id;
-                }
-            };
+            } else {
+                logger.error('tweet.statuses is undefined : ' + tweets);
+            }
         });
-}, 6000);
+}, 60000);
