@@ -1,7 +1,7 @@
 var _ = require('lodash/string');
 
 module.exports = {
-    createRegex : function (sentence) {
+    createRegex : function(sentence) {
         var regexStr = '';
 
         for (var i = 0; i < sentence.length; i++) {

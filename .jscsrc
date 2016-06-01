@@ -1,0 +1,19 @@
+{
+	"preset": "grunt",
+	"validateIndentation": null,
+	"disallowMixedSpacesAndTabs": null,
+	"validateQuoteMarks": null,
+	"requireSpaceBetweenArguments": null,
+	"disallowSpaceAfterObjectKeys": null,
+	"requireSemicolons": null,
+	"requireOperatorBeforeLineBreak": null,
+	"disallowSpacesInAnonymousFunctionExpression": null,
+	"requireLineFeedAtFileEnd": null,
+	"requireSpaceBeforeBlockStatements": null,
+	"maximumLineLength": null,
+	"disallowSpacesInsideParentheses": null,
+	"disallowTrailingWhitespace": null,
+	"requireSpaceBeforeBinaryOperators": null,
+	"requireSpaceAfterBinaryOperators": null,
+	"disallowSpacesInFunctionDeclaration": null
+}

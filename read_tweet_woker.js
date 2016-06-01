@@ -28,7 +28,7 @@ function displayTweet(msg, cb) {
         console.log();
     }
 
-    setTimeout(function(){
+    setTimeout(function() {
         cb(true);
     }, timeByTweet);
 }
