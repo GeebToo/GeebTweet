@@ -40,7 +40,7 @@ setInterval(function() {
             since_id: tweetId
         },
         function(error, tweets, response) {
-            if (tweets.statuses) {
+            if (tweets) {
                 for (var i = 0; i < tweets.statuses.length; i++) {
                     if (tweets.statuses[i].id > tweetId) {
                         var tweet = tweets.statuses[i].text;
