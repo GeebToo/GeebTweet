@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.1.2
+- fix(GetTweet): filter the tweets to push to RabbitmMQ
+- fix(GetTweet): remove the URL link from tweets
+
 ## 1.1.1
  - [HOTFIX] Fix bugs in get_tweet_worker.js
 

@@ -45,13 +45,22 @@ setInterval(function() {
                     if (tweets.statuses[i].id > tweetId) {
                         var tweet = tweets.statuses[i].text;
                         var tweetSplit = tweet.split(regex);
+                        var tweetFormated = '' + sentence.toUpperCase();
 
-                        if (tweetSplit[1] !== undefined) {
-                            RabbitMQMapper.publish('', RabbitMQMapper.queue, new Buffer(sentence.toUpperCase() + tweetSplit[1]));
-                            logger.debug(sentence.toUpperCase() + tweetSplit[1]);
-                        } else {
-                            RabbitMQMapper.publish('', RabbitMQMapper.queue, new Buffer(sentence.toUpperCase() + tweetSplit[0]));
-                            logger.debug(sentence.toUpperCase() + tweetSplit[0]);
+                        if (tweetSplit[1] !== undefined && tweetSplit[1].length > 0) {
+                            tweetFormated += tweetSplit[1];
+                        } else if (tweetSplit[0].length > 0) {
+                            tweetFormated += tweetSplit[0];
+                        }
+
+                        // Remove url link from tweet
+                        logger.debug('BeforeRemoveUrl : ' + tweetFormated);
+                        tweetFormated = Utils.removeUrl(tweetFormated);
+                        logger.debug('AfterRemoveUrl  : ' + tweetFormated);
+                        // Doesn't take the tweet ending with the sentence
+                        if (tweetFormated.length > sentence.length + 1) {
+                            RabbitMQMapper.publish('', RabbitMQMapper.queue, new Buffer(tweetFormated));
+                            logger.debug('PushToRabbitMQ  : ' + tweetFormated);
                         }
                     } else {
                         logger.debug('[TWEETER] same tweet : ' + tweets.statuses[i].text);
