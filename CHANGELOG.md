@@ -1,6 +1,7 @@
 # Changelog
 
 # 1.1.2
+- test(common): add unit tests
 - fix(GetTweet): filter the tweets to push to RabbitmMQ
 - fix(GetTweet): remove the URL link from tweets
 
