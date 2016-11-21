@@ -9,5 +9,8 @@
   "timeByTweet" : 6000,
   "displayOnLCD" : true,
   "lcdLineLenght" : 20,
-  "lcdNbreOfLine" : 4
+  "lcdNbreOfLine" : 4,
+  "mongo" : {
+    "uri" : "mongodb://<user>:<pwd>@<host>:<port>/<database>"
+  }
 }
