@@ -1,6 +1,7 @@
 # Changelog
 
 # 1.1.x (unreleased)
+- fix(utils): simplify regex to split tweet
 - style: adding eslintrc and editorconfig
 - test(common): add unit tests
 - fix(GetTweet): filter the tweets to push to RabbitmMQ

@@ -25,7 +25,7 @@ if (process.argv.length != 4) {
 var sentence = process.argv[2];
 var locale = process.argv[3];
 var tweetId = 0;
-var regex = new RegExp(Utils.createRegex(sentence));
+var regex = new RegExp(sentence, 'gi');
 
 RabbitMQMapper.initPublisher(logger);
 
