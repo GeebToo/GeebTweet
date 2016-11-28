@@ -1,6 +1,7 @@
 # Changelog
 
 # 1.1.x (unreleased)
+- fix(readTweet): displays only the tweets smaller than the screen size (LCD display)
 - fix(utils): simplify regex to split tweet
 - style: adding eslintrc and editorconfig
 - test(common): add unit tests

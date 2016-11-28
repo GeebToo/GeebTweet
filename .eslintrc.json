@@ -17,6 +17,7 @@
         "quotes": ["error", "single"],
         "semi": ["error", "always"],
         "space-before-function-paren": ["error", "never"],
+        "space-infix-ops": ["error"],
         "no-constant-condition": 0,
         "no-unused-vars": 0
     }

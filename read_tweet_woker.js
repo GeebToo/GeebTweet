@@ -11,7 +11,7 @@ var lcdNbreOfLine = config.lcdNbreOfLine;
 
 if (displayOnLCD) {
   var LCD = require('lcdi2c');
-  var lcd = new LCD( 1, 0x27, 20, 4 );
+  var lcd = new LCD(1, 0x27, lcdLineLenght, lcdNbreOfLine);
 }
 RabbitMQMapper.initConsumer(logger, displayTweet);
 
@@ -20,18 +20,24 @@ function displayTweet(msg, cb) {
 
   if (displayOnLCD) {
     var lcdTweet = formatTweetForLCD(tweet, lcdLineLenght);
-    lcd.clear();
-    for (var j = 0; j < lcdTweet.length && j < lcdNbreOfLine; j++) {
-      lcd.println(lcdTweet[j], j+1);
+    if (lcdTweet.length > lcdNbreOfLine) {
+      logger.debug('Too long...(' + tweet.length + ') - tweet : ' + tweet);
+      cb(true);
+    } else {
+      lcd.clear();
+      for (var j = 0; j < lcdTweet.length && j < lcdNbreOfLine; j++) {
+        lcd.println(lcdTweet[j], j + 1);
+      }
+      setTimeout(function() {
+        cb(true);
+      }, timeByTweet);
     }
   } else {
     logger.info(tweet);
-    logger.info();
+    setTimeout(function() {
+      cb(true);
+    }, 2000);
   }
-
-  setTimeout(function() {
-    cb(true);
-  }, timeByTweet);
 }
 
 function formatTweetForLCD(tweet, lineLength) {
