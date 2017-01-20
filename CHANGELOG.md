@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.1.3 (unreleased)
+- style: replace eslint by standardJS
+
 # 1.1.2 (2016/11/29)
 - fix(readTweet): displays only the tweets smaller than the screen size (LCD display)
 - fix(utils): simplify regex to split tweet

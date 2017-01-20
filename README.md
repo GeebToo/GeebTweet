@@ -1,4 +1,5 @@
 # GeebTweet
+[![Standard - JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 
 Display on a little LCD (4*20) or web page all tweets which contains a specific sentence.
 By example it's possible to display all tweets which contains `Je veux`

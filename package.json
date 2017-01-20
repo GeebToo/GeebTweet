@@ -4,7 +4,7 @@
   "description": "Display on a little LCD (4*20) all tweets which contains a specific word or sentence",
   "main": "app.js",
   "scripts": {
-    "test": "mocha"
+    "test": "standard && mocha"
   },
   "author": "GeebToo",
   "license": "MIT",
@@ -18,12 +18,7 @@
     "winston": "^2.2.0"
   },
   "devDependencies": {
-    "eslint": "3.10.2",
-    "eslint-config-standard": "6.2.1",
-    "eslint-plugin-import": "2.2.0",
-    "eslint-plugin-jsx-a11y": "3.0.1",
-    "eslint-plugin-promise": "3.4.0",
-    "eslint-plugin-standard": "2.0.1",
-    "mocha": "^3.1.2"
+    "mocha": "^3.1.2",
+    "standard": "8.6.0"
   }
 }
