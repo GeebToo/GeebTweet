@@ -1,6 +1,7 @@
 # Changelog
 
 # 1.1.3 (unreleased)
+- chore: adding travis ci
 - style: replace eslint by standardJS
 
 # 1.1.2 (2016/11/29)
