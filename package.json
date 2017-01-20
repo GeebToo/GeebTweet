@@ -4,7 +4,8 @@
   "description": "Display on a little LCD (4*20) all tweets which contains a specific word or sentence",
   "main": "app.js",
   "scripts": {
-    "test": "standard && mocha"
+    "test": "mocha",
+    "lint": "./node_modules/.bin/standard"
   },
   "author": "GeebToo",
   "license": "MIT",
