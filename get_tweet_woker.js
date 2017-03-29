@@ -61,7 +61,7 @@ setInterval(function () {
             logger.debug('BeforeRemoveUrl : ' + tweetFormated)
             tweetFormated = Utils.removeUrl(tweetFormated)
             logger.debug('AfterRemoveUrl  : ' + tweetFormated)
-                        // Doesn't take the tweet ending with the sentence
+            // Doesn't take the tweet ending with the sentence
             if (tweetFormated.length > sentence.length + 1) {
               RabbitMQMapper.publish('', RabbitMQMapper.queue, new Buffer(tweetFormated))
               logger.debug('PushToRabbitMQ  : ' + tweetFormated)
@@ -78,5 +78,6 @@ setInterval(function () {
       } else {
         logger.error('tweet.statuses is undefined : ' + tweets)
       }
-    })
+    }
+  )
 }, 60000)

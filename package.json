@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "mocha",
-    "lint": "./node_modules/.bin/standard"
+    "lint": "./node_modules/.bin/standard --fix"
   },
   "author": "GeebToo",
   "license": "MIT",
